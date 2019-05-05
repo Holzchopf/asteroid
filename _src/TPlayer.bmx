@@ -28,6 +28,7 @@ Type TPlayer
 		' acceleration force - react to JoyY() (attention, Joy "forward" is -1)
 		Local facc:Float = -jy * COEFF_ACCELERATE
 		
+		rem
 		' propelling vector
 		Local ax:Float = Cos(rot) * facc
 		Local ay:Float = Sin(rot) * facc
@@ -44,8 +45,8 @@ Type TPlayer
 		'__proj = cosphi
 		'- scale facc according to cosphi: @1 = x1.0, @0 = x2.0
 		Local scl:Float = 2.0 - cosphi
-		facc :* scl
-		
+		'facc :* scl
+		End Rem
 		
 		'--- allow negative acceleration? ---
 		If facc < 0 Then facc = 0
@@ -59,9 +60,19 @@ Type TPlayer
 		fx = Cos(rot) * facc - Cos(a0) * fdec
 		fy = Sin(rot) * facc - Sin(a0) * fdec
 		
-		' update velocity
-		vx = vx + fx
-		vy = vy + fy
+		' resulting acceleration
+		Local ax:Float = fx / MASS_PLAYER
+		Local ay:Float = fy / MASS_PLAYER
+		
+		' s1 = s0 + 1/2 * a * t^2 + v0 * t
+		' v1 = v0 + a * t
+		
+		' first: update position
+		x :+ dms * (ax / 2 * dms + vx)
+		y :+ dms * (ay / 2 * dms + vy)
+		' second: update velocity
+		vx :+ ax * dms
+		vy :+ ay * dms
 		
 		' --- limit vmax by force loss on velocity? ---
 		' limit total velocity
@@ -75,8 +86,8 @@ Type TPlayer
 		endrem
 		
 		' update position
-		x :+ vx * dms
-		y :+ vy * dms
+		'x :+ vx * dms
+		'y :+ vy * dms
 		
 		' wrap over screen edges
 		If x < 0 Then x = SCREEN_WIDTH
