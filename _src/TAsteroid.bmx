@@ -8,6 +8,7 @@ Type TAsteroid
 	Field vx:Float, vy:Float
 	Field rot:Float = 0
 	Field size:Float			' radius of the asteroid in px
+	Field mass:Float
 	
 	' create one at random
 	Function CreateOne() 
@@ -20,8 +21,14 @@ Type TAsteroid
 		a.vy = Sin(rot) * vel
 		
 		a.size = Rnd(10, 50)
+		a.CalculateMass()
 		all.AddLast(a)
 	EndFunction
+	
+	' calculate mass from size
+	Method CalculateMass()
+		mass = size * size * size
+	End Method
 	
 	' turn this asteroid into two, split among the axis 
 	' going through the center and pointing pX/pY
@@ -41,6 +48,7 @@ Type TAsteroid
 				a.vx = vx - pY * dist * 0.1
 				a.vy = vy + pX * dist * 0.1
 				a.size = lsize
+				a.CalculateMass()
 				all.AddLast(a)
 			Next
 		EndIf
@@ -75,10 +83,10 @@ Type TAsteroid
 		x :+ vx * dms
 		y :+ vy * dms
 		' wrap over screen edges
-		If x < -size Then x = SCREEN_WIDTH + size
-		If x > SCREEN_WIDTH + size Then x = -size
-		If y < -size Then y = SCREEN_HEIGHT + size
-		If y > SCREEN_HEIGHT + size Then y = -size
+		If x < 0 Then x = SCREEN_WIDTH
+		If x > SCREEN_WIDTH Then x = 0
+		If y < 0 Then y = SCREEN_HEIGHT
+		If y > SCREEN_HEIGHT Then y = 0
 	EndMethod
 	
 	' check for collision with other asteroid,
@@ -104,12 +112,22 @@ Type TAsteroid
 			pAsteroid.x :- cx * od
 			pAsteroid.y :- cy * od
 			' swap velocity vector
-			Local sx:Float = vx
-			Local sy:Float = vy
-			vx = pAsteroid.vx
-			vy = pAsteroid.vy
-			pAsteroid.vx = sx
-			pAsteroid.vy = sy
+			Local m1:Float = pAsteroid.mass
+			Local mtot:Float = mass + m1
+			Local sx0:Float = vx
+			Local sy0:Float = vy
+			Local sx1:Float = pAsteroid.vx
+			Local sy1:Float = pAsteroid.vy
+			vx = 2 * (mass * sx0 + m1 * sx1) / mtot - sx0
+			vy = 2 * (mass * sy0 + m1 * sy1) / mtot - sy0
+			pAsteroid.vx = 2 * (mass * sx0 + m1 * sx1) / mtot - sx1
+			pAsteroid.vy = 2 * (mass * sy0 + m1 * sy1) / mtot - sy1
+			Rem
+			vx = pAsteroid.vx * pAsteroid.mass / mtot
+			vy = pAsteroid.vy * pAsteroid.mass / mtot
+			pAsteroid.vx = sx * mass / mtot
+			pAsteroid.vy = sy * mass / mtot
+			End Rem
 		EndIf
 	EndMethod
 	

@@ -108,9 +108,27 @@ Type TPlayer
 		For Local a:TAsteroid = EachIn TAsteroid.all
 			dx = a.x - x
 			dy = a.y - y
-			dd = Sqr(dx * dx + dy * dy) 
-			If dd <= (16 + a.size) Then
-				TAsteroid.all.Remove(a)
+			dd = Sqr(dx * dx + dy * dy)
+			Local mind:Float = (a.size + 16)
+			If dd <= mind Then
+				' collision vector (normalised)
+				Local cx:Float , cy:Float
+				cx = dx / dd
+				cy = dy / dd
+				' overlapping distance,
+				' move both away by half of how much they overlap
+				Local od:Float = (dd - mind)' / 2.0
+				'x :+ cx * od
+				'y :+ cy * od
+				a.x :- cx * od
+				a.y :- cy * od
+				'TAsteroid.all.Remove(a)
+				Local dvx:Float = a.vx - vx
+				Local dvy:Float = a.vy - vy
+				a.vx :- 2*dvx
+				a.vy :- 2*dvy
+				'vx = 0
+				'vy = 0
 			EndIf
 		Next
 	End Method
@@ -118,9 +136,14 @@ Type TPlayer
 	' draw player graphics
 	Method Draw()
 		SetColor(255,255,255)
-		SetOrigin(x,y)
-		SetRotation(rot)
-		'DrawPoly(polyxy)
-		DrawImage(imgSpaceship,0,0)
+		For Local iy:Int = -1 To 1
+			For Local ix:Int = -1 To 1
+				SetOrigin(x+SCREEN_WIDTH*ix,y+SCREEN_HEIGHT*iy)
+				SetRotation(rot)
+				'DrawPoly(polyxy)
+				DrawImage(imgSpaceship,0,0)
+			Next
+		Next
+		'DrawImage(imgSpaceship,0,0)
 	End Method
 EndType
