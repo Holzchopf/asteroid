@@ -14,8 +14,11 @@ Include "_src/consts.bmx"
 Include "_src/TAsteroid.bmx"
 Include "_src/TAsteroidDebris.bmx"
 Include "_src/TExplosion.bmx"
+Include "_src/TMobile.bmx"
 Include "_src/TPlayer.bmx"
 Include "_src/TShot.bmx"
+Include "_src/TSolid.bmx"
+'Include "_src/TVisible.bmx"
 
 
 ' initialise random number generator with arbitrary value,
@@ -45,6 +48,8 @@ MidHandleImage(imgAsteroidDebris)
 
 Global player:TPlayer = New TPlayer
 
+TPlayer.CreateOne( SCREEN_WIDTH/2, SCREEN_HEIGHT/2 )
+TPlayer.CreateOne( SCREEN_WIDTH/4, SCREEN_HEIGHT/2 )
 For Local i:Int = 0 Until 20
 	TAsteroid.CreateOne()
 Next
@@ -87,12 +92,17 @@ While Not (KeyDown(KEY_ESCAPE) Or AppTerminate())
 	_ms = _cms
 	ms :+ dms
 	
-	player.Update() 
-	TShot.UpdateAll()
-	TAsteroid.UpdateAll()
-	TAsteroidDebris.UpdateAll()
-	TExplosion.UpdateAll()
-	player.CollideWithAsteroids() 
+	TMobile.UpdateAll()
+	TSolid.UpdateAll()
+	
+	'player.Update() 
+	'TShot.UpdateAll()
+	'TAsteroid.UpdateAll()
+	
+	'TAsteroidDebris.UpdateAll()
+	'TExplosion.UpdateAll()
+	
+	'player.CollideWithAsteroids() 
 	
 	' output
 	SetOrigin(0,0)
@@ -113,11 +123,13 @@ While Not (KeyDown(KEY_ESCAPE) Or AppTerminate())
 	end rem
 	
 	' draw game elements
-	TAsteroid.DrawAll()
-	TExplosion.DrawAll()
-	TAsteroidDebris.DrawAll()
-	player.Draw()
-	TShot.DrawAll()
+	TSolid.DrawAll()
+	'TAsteroid.DrawAll()
+	
+	'TExplosion.DrawAll()
+	'TAsteroidDebris.DrawAll()
+	'player.Draw()
+	'TShot.DrawAll()
 	
 	' wait for timer, but not for VSYNC - most correct way to keep
 	' game synced and framerate independent
